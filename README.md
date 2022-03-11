@@ -41,6 +41,16 @@ Step 3: Run simulations (how many times is PhyloDecR correct?)
 
 How many partitions are there?
 
--   n=6: P=45
--   n=7: ???
--   n=8: P=1701
+``` r
+source("helperFunctions/myStirlingFunction.R")
+myStirlingFunction(n = 6,k=4)
+#> [1] 65
+myStirlingFunction(n = 7,k=4)
+#> [1] 350
+myStirlingFunction(n = 8,k=4)
+#> [1] 1701
+myStirlingFunction(n = 9,k=4)
+#> [1] 7770
+myStirlingFunction(n =10,k=4)
+#> [1] 34105
+```
