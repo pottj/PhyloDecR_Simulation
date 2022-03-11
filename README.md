@@ -1,7 +1,29 @@
-# Simulation study to phylogenetic decisiveness 
 
-Simulation study to phylogenetic decisiveness 
+<!-- README.md is generated from README.Rmd. Please edit that file -->
 
-Test random sets with n=6, 7, 8 taxa and compare speed and reply of Fischers Algorithm and the correct test (Four-way partition property). 
+# Simulation study to phylogenetic decisiveness
 
-**Definition** (Four-way partition property). Let $S_n = {Z_1, ..., Z_k}$ be a set of quadruples of taxa set $X$, $\|X\| = n$. Then, $S_n$ satisfies the four-way partition property (for $X$) if, for all partitions of $X$ into four disjoint, nonempty sets A_1, A_2, A_3 and A_4 (with $A_1 \\cup A_2 \\cup A_3 \\cup A_4 = X$) there exists $a_i \\in A_i$ for $i = 1, 2, 3, 4$ for which ${a1, a2, a3, a4} \\in S_n$.
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of PhyloDecR_Simulation is to test random sets with n=6, 7, 8
+taxa and compare speed and reply of Fischers Algorithm and the correct
+test (Four-way partition property).
+
+**Definition** (Four-way partition property). Let
+*S*<sub>*n*</sub> = {*Z*<sub>1</sub>, ..., *Z*<sub>*k*</sub>} be a set
+of quadruples of taxa set *X*, \|*X*\| = *n*. Then, *S*<sub>*n*</sub>
+satisfies the four-way partition property (for *X*) if, for all
+partitions of *X* into four disjoint, nonempty sets
+*A*<sub>1</sub>, *A*<sub>2</sub>, *A*<sub>3</sub> and *A*<sub>4</sub>
+(with
+*A*<sub>1</sub> ∪ *A*<sub>2</sub> ∪ *A*<sub>3</sub> ∪ *A*<sub>4</sub> = *X*)
+there exists *a*<sub>*i*</sub> ∈ *A*<sub>*i*</sub> for *i* = 1, 2, 3, 4
+for which
+{*a*<sub>1</sub>, *a*<sub>2</sub>, *a*<sub>3</sub>, *a*<sub>4</sub>} ∈ *S*<sub>*n*</sub>.
+
+**Theorem** (Theorem 2 of [M. Steel and M.J.
+Sanderson](https://www.sciencedirect.com/science/article/pii/S0893965909003000?via%3Dihub)).
+A collection *S*<sub>*n*</sub> of quadruples of *X* is phylogenetically
+decisive if and only if *S*<sub>*n*</sub> satisfies the four-way
+partition property for *X*.
