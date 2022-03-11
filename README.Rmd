@@ -21,3 +21,19 @@ The goal of PhyloDecR_Simulation is to test random sets with n=6, 7, 8 taxa and 
 **Definition** (Four-way partition property). Let $S_n = \{Z_1, ..., Z_k\}$ be a set of quadruples of taxa set $X$, $\vert X \vert = n$. Then, $S_n$ satisfies the four-way partition property (for $X$) if, for all partitions of $X$ into four disjoint, nonempty sets $A_1, A_2, A_3$ and $A_4$ (with $A_1 \cup A_2 \cup A_3 \cup A_4 = X$) there exists $a_i \in A_i$ for $i = 1, 2, 3, 4$ for which $\{a_1, a_2, a_3, a_4\} \in S_n$.
 
 **Theorem** (Theorem 2 of [M. Steel and M.J. Sanderson](https://www.sciencedirect.com/science/article/pii/S0893965909003000?via%3Dihub)). A collection $S_n$ of quadruples of $X$ is phylogenetically decisive if and only if $S_n$ satisfies the four-way partition property for $X$.
+
+## Planned stuff
+
+Step 1: Create all partitions for n=6, 7, and 8 (these partitions are fix)
+
+Step 2: Create test function (using input from PhyloDecR package)
+
+Step 3: Run simulations (how many times is PhyloDecR correct?)
+
+## Stirling numbers of the second kind
+
+How many partitions are there? 
+
+* n=6: P=45
+* n=7: ???
+* n=8: P=1701

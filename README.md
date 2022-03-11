@@ -27,3 +27,20 @@ Sanderson](https://www.sciencedirect.com/science/article/pii/S0893965909003000?v
 A collection *S*<sub>*n*</sub> of quadruples of *X* is phylogenetically
 decisive if and only if *S*<sub>*n*</sub> satisfies the four-way
 partition property for *X*.
+
+## Planned stuff
+
+Step 1: Create all partitions for n=6, 7, and 8 (these partitions are
+fix)
+
+Step 2: Create test function (using input from PhyloDecR package)
+
+Step 3: Run simulations (how many times is PhyloDecR correct?)
+
+## Stirling numbers of the second kind
+
+How many partitions are there?
+
+-   n=6: P=45
+-   n=7: ???
+-   n=8: P=1701
