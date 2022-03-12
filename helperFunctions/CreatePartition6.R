@@ -154,30 +154,68 @@ save(myTab_n6,file = "../partitions/partitions_n6.RData")
 
 #' # Test ####
 #' ***
-#' I use the second example data set from my PhyloDecR package. 
+#' I use the example data sets from my master thesis. 
 #' 
-fn2 = system.file("extdata", 
-                  "example_2_Decisive.txt", 
-                  package = "PhyloDecR")
-test2 = createInput(fn=fn2,sepSym = ",")
-dummy = test2$data
-dummy2 = dummy[status=="input",]
+test1 = createInput(fn="../testData/S6_Decisive.txt",sepSym = "_")
+test2 = createInput(fn="../testData/S6_Decisive_unresolvedByFA.txt",sepSym = "_")
+test3 = createInput(fn="../testData/S6_notDecisive.txt",sepSym = "_")
+test1_checks = initialCheck(test1$data)
+test2_checks = initialCheck(test2$data)
+test3_checks = initialCheck(test3$data)
+test1_alg<-runAlgorithm(data = test1$data,verbose = T)
+test2_alg<-runAlgorithm(data = test2$data,verbose = T)
+test3_alg<-runAlgorithm(data = test3$data,verbose = T)
 
-myTab = copy(myTab_n6)
+dummy1 = test1$data
+dummy2 = test2$data
+dummy3 = test3$data
 
+dummy1 = dummy1[status=="input",]
+dummy2 = dummy2[status=="input",]
+dummy3 = dummy3[status=="input",]
+
+myTab1 = copy(myTab_n6)
+myTab2 = copy(myTab_n6)
+myTab3 = copy(myTab_n6)
+
+for(i in 1:dim(dummy1)[1]){
+  #i=1
+  myInput = dummy1[i,quadruple]
+  filt = grepl(myInput,myTab1$allQuads)
+  myTab1[filt==T,status := "covered"]
+  myTab1[filt==T,count := count + 1]
+  myTab1
+}
 for(i in 1:dim(dummy2)[1]){
   #i=1
   myInput = dummy2[i,quadruple]
-  filt = grepl(myInput,myTab$allQuads)
-  myTab[filt==T,status := "covered"]
-  myTab[filt==T,count := count + 1]
-  myTab
+  filt = grepl(myInput,myTab2$allQuads)
+  myTab2[filt==T,status := "covered"]
+  myTab2[filt==T,count := count + 1]
+  myTab2
+}
+for(i in 1:dim(dummy3)[1]){
+  #i=1
+  myInput = dummy3[i,quadruple]
+  filt = grepl(myInput,myTab3$allQuads)
+  myTab3[filt==T,status := "covered"]
+  myTab3[filt==T,count := count + 1]
+  myTab3
 }
 
-table(myTab$count)
-if(min(myTab$count>0)) message("phylogenetically decisive according to 4WPP")
+table(myTab1$count)
+table(myTab2$count)
+table(myTab3$count)
+if(min(myTab1$count>0)) message("phylogenetically decisive according to 4WPP") else message("not phylogenetically decisive")
+if(min(myTab2$count>0)) message("phylogenetically decisive according to 4WPP") else message("not phylogenetically decisive")
+if(min(myTab3$count>0)) message("phylogenetically decisive according to 4WPP") else message("not phylogenetically decisive")
 
-#' Okay, the test is positive. The data set is decisive according to 4WPP & Fischers Algorithm.  
+#' Okay, the test is positive:
+#' 
+#' * as stated in my thesis, test1 is not decisive & test2 is decisive
+#' * Fischers Algorithm fails for both
+#'   * test1: not enough qaudruples & not enough tuples
+#'   * test2: not enough quadruples
 #' 
 #' # SessionInfo ####
 #' ***
