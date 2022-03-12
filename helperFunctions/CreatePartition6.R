@@ -212,10 +212,9 @@ if(min(myTab3$count>0)) message("phylogenetically decisive according to 4WPP") e
 
 #' Okay, the test is positive:
 #' 
-#' * as stated in my thesis, test1 is not decisive & test2 is decisive
-#' * Fischers Algorithm fails for both
-#'   * test1: not enough qaudruples & not enough tuples
-#'   * test2: not enough quadruples
+#' * as stated in my thesis, test1 with 10 quadruples is decisive using Fischers Algorithm or 4WPP
+#' * test2 with 9 quadruples is also decisive, but not resolvable by the algorithm, as there are not enough quadruples in it
+#' * test3 with 8 quadruples is not decisive, and correctly identified as such by the initial test (cannot be decisive as there are not enough tuples) and the 4WPP
 #' 
 #' # SessionInfo ####
 #' ***
