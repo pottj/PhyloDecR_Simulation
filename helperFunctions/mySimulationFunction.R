@@ -1,7 +1,7 @@
 #' was will ich?
 #' Ich will eine Simulation mit Parametern n, number_quads, repeats, datasets
 #' 
-mySimulationFunction = function(number_taxa, number_quads, repeats, data1, data2){
+mySimulationFunction = function(number_taxa, number_quads, repeats, data1, data2, verbose=F){
   # number_taxa = 6
   # number_quads = 10
   # repeats = 100
@@ -18,16 +18,16 @@ mySimulationFunction = function(number_taxa, number_quads, repeats, data1, data2
   
   allCombis = data.table::as.data.table(t(combn(m,k)))
   rep2 = dim(allCombis)[1]
-  if(rep2<repeats) messeage("Testing all combination only once ...")
+  if(rep2<repeats) message("Testing all combination only once ...")
   if(rep2<repeats) repeats = rep2 
   message("Working on ",repeats," repeats of ", dim(allCombis)[1]," combinations")
   
   x = sample(x = 1:rep2,size = repeats,replace = F)
-  hist(x)
-  table(duplicated(x))
+  y = seq(1,repeats,by=ceiling(repeats/100))
   
   dumTab = foreach(i = 1:repeats)%do%{
     #i=1
+    if(is.element(i,y) & verbose==T) message("Working on combination ",i)
     myX = x[i]
     myCombi = as.numeric(allCombis[myX,])
     data3 = copy(data1)
@@ -66,11 +66,13 @@ mySimulationFunction = function(number_taxa, number_quads, repeats, data1, data2
     }  
     
     # Step 4: summary
+    quads = paste(data3$quadruple, collapse ="|")
     res = data.table(check1 = test_1[1],
                      check2 = test_1[2],
                      check3 = test_1[3],
                      FischersAlg = test_2_res,
-                     FWPP = test_3_res)
+                     FWPP = test_3_res,
+                     input = quads)
     res
   }
   dumTab = rbindlist(dumTab)
