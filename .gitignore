@@ -40,5 +40,5 @@ vignettes/*.pdf
 
 # Other stuff
 helperfunctions/*.html
-results/*.RData
+results/*_rep10000.RData
 scripts/*.html
