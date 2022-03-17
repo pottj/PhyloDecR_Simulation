@@ -19,10 +19,13 @@
 rm(list = ls())
 time0<-Sys.time()
 
-.libPaths()
+.libPaths("C:/userprograms/R_4.1.1/")
+# install.packages("H:/R/PhyloDecR_0.0.0.9007.tar.gz", 
+#                  repos = NULL, type = "source")
 library(PhyloDecR)
 library(data.table)
 library(foreach)
+library(doMC)
 
 source("../helperFunctions/mySimulationFunction.R")
 
@@ -81,7 +84,9 @@ plot(dumTab2$k,dumTab2$posRate)
 
 #' # Loop with 10,000 repeats ####
 #' ***
-dumTab3 = foreach(j=1:34)%do%{
+registerDoMC(cores = 4)
+
+dumTab3 = foreach(j=1:34)%dopar%{
   # j=10
   time1 = Sys.time()
   myTest = mySimulationFunction(number_taxa = 7, 
