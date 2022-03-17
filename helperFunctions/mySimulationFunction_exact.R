@@ -13,21 +13,21 @@ mySimulationFunction_exact = function(number_taxa, number_quads, repeats, data1,
   
   allQuads = data.table::as.data.table(t(combn(n,4)))
   stopifnot(dim(data1)[1] == dim(allQuads)[1])
-  message("Input data matches to given taxa size")
+  if(verbose == T) message("       Input data matches to given taxa size")
   m = dim(data1)[1]
   
   allCombis = data.table::as.data.table(t(combn(m,k)))
   rep2 = dim(allCombis)[1]
-  if(rep2<repeats) message("Testing all combination only once ...")
+  if(rep2<repeats & verbose == T) message("       Testing all combination only once ...")
   if(rep2<repeats) repeats = rep2 
-  message("Working on ",repeats," repeats of ", dim(allCombis)[1]," combinations")
+  if(verbose == T) message("       Working on ",repeats," repeats of ", dim(allCombis)[1]," combinations")
   
   x = sample(x = 1:rep2,size = repeats,replace = F)
   y = seq(1,repeats,by=ceiling(repeats/100))
   
   dumTab = foreach(i = 1:repeats)%do%{
     #i=1
-    if(is.element(i,y) & verbose==T) message("Working on combination ",i)
+    #if(is.element(i,y) & verbose==T) message("              Working on combination ",i)
     myX = x[i]
     myCombi = as.numeric(allCombis[myX,])
     data3 = copy(data1)
