@@ -9,6 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+library(data.table)
+library(ggplot2)
 ```
 
 # Simulation study to phylogenetic decisiveness 
@@ -16,23 +18,21 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of PhyloDecR_Simulation is to test random sets with n=6, 7, 8 taxa and compare speed and reply of Fischers Algorithm and the correct test (Four-way partition property). 
+The goal of PhyloDecR_Simulation is to test random sets with n=6, 7, 8 taxa and compare speed and reply of Fischers Algorithm and the correct test (4-way partition property). 
 
-**Definition** (Four-way partition property). Let $S_n = \{Z_1, ..., Z_k\}$ be a set of quadruples of taxa set $X$, $\vert X \vert = n$. Then, $S_n$ satisfies the four-way partition property (for $X$) if, for all partitions of $X$ into four disjoint, nonempty sets $A_1, A_2, A_3$ and $A_4$ (with $A_1 \cup A_2 \cup A_3 \cup A_4 = X$) there exists $a_i \in A_i$ for $i = 1, 2, 3, 4$ for which $\{a_1, a_2, a_3, a_4\} \in S_n$.
+**Definition** (4-way partition property). Let $S_n = \{Z_1, ..., Z_k\}$ be a set of quadruples of taxa set $X$, $\vert X \vert = n$. Then, $S_n$ satisfies the four-way partition property (for $X$) if, for all partitions of $X$ into four disjoint, nonempty sets $A_1, A_2, A_3$ and $A_4$ (with $A_1 \cup A_2 \cup A_3 \cup A_4 = X$) there exists $a_i \in A_i$ for $i = 1, 2, 3, 4$ for which $\{a_1, a_2, a_3, a_4\} \in S_n$.
 
 **Theorem** (Theorem 2 of [M. Steel and M.J. Sanderson](https://www.sciencedirect.com/science/article/pii/S0893965909003000?via%3Dihub)). A collection $S_n$ of quadruples of $X$ is phylogenetically decisive if and only if $S_n$ satisfies the four-way partition property for $X$.
 
 ## Planned stuff
 
-Step 1: Create all partitions for n=6, 7, and 8 (these partitions are fix)
+### Step 1: Create all partitions 
 
-Step 2: Create test function (using input from PhyloDecR package)
+for n=6, 7, and 8 (these partitions are fix)
 
-Step 3: Run simulations (how many times is PhyloDecR correct?)
+-> See scripts/CreatePartitionX.R 
 
-## Stirling numbers of the second kind
-
-How many partitions are there? 
+The number of possible partitions is given by the Stirling numbers of the second kind: 
 
 ```{r}
 source("helperFunctions/myStirlingFunction.R")
@@ -44,3 +44,85 @@ myStirlingFunction(n =10,k=4)
 
 ```
 
+
+### Step 2: Create simulation function 
+
+--> See helperFunctions/mySimulationFunction.R and mySimulationFunction_exact.R (the second one used only for n=6 as all possible combinations were below 10,000)
+
+```{r}
+# part of mySimulationFunction.R
+# m = number of all possible quadruples for n taxa
+# k = number of input quadruples
+
+# Example 1: n=6, m=15, k=8, repeats=10000
+n=6;m=15;k=8;repeats=10000
+nr_allCombis = choose(m,k)
+if(nr_allCombis<repeats) message("Testing all combination only once ...")
+if(nr_allCombis<repeats) repeats = nr_allCombis 
+message("Working on ",repeats," repeats of ", nr_allCombis," combinations")
+
+# Example 2: n=7, m=35, k=18, repeats=10000
+n=7;m=35;k=18;repeats=10000
+nr_allCombis = choose(m,k)
+if(nr_allCombis<repeats) message("Testing all combination only once ...")
+if(nr_allCombis<repeats) repeats = nr_allCombis 
+message("Working on ",repeats," repeats of ", nr_allCombis," combinations")
+
+# Example 3: n=8, m=70, k=35, repeats=10000
+n=8;m=70;k=35;repeats=10000
+nr_allCombis = choose(m,k)
+if(nr_allCombis<repeats) message("Testing all combination only once ...")
+if(nr_allCombis<repeats) repeats = nr_allCombis 
+message("Working on ",repeats," repeats of ", nr_allCombis," combinations")
+
+```
+
+### Step 3: Run simulations
+
+--> See scripts/Simulation_nX.R
+
+### Step 4: Summarize my results
+
+--> See scripts/Simulation_Zusammenfassung.R
+
+```{r}
+load("results/SimulationResults_n6.RData")
+load("results/SimulationResults_n7.RData")
+load("results/SimulationResults_n8.RData")
+source("helperFunctions/my4FTFunction.R")
+
+SimulationResults_n6[,n:=6]
+SimulationResults_n7[,n:=7]
+SimulationResults_n8[,n:=8]
+
+simData = rbind(SimulationResults_n6,
+                SimulationResults_n7,
+                SimulationResults_n8)
+PlotData = data.table(n = rep(simData$n,2),
+                      k = rep(simData$k,2),
+                      phyloDec = c(simData$NR_FAlg_pos,simData$NR_PhyloDec),
+                      category = c(rep("Algorithm",dim(simData)[1]),
+                                   rep("4WPP",dim(simData)[1])))
+
+ggplot(data=PlotData,aes(fill=category, y=phyloDec, x=k)) + 
+  facet_wrap(vars(n),scales = "free_x") + 
+  geom_bar(position="dodge", stat="identity")
+
+stats_n6 = my4FTFunction(P = sum(SimulationResults_n6$NR_PhyloDec),
+                         N = sum(SimulationResults_n6$NR_NotPhyloDec),
+                         PP = sum(SimulationResults_n6$NR_FAlg_pos))
+stats_n7 = my4FTFunction(P = sum(SimulationResults_n7$NR_PhyloDec),
+                         N = sum(SimulationResults_n7$NR_NotPhyloDec),
+                         PP = sum(SimulationResults_n7$NR_FAlg_pos))
+stats_n8 = my4FTFunction(P = sum(SimulationResults_n8$NR_PhyloDec),
+                         N = sum(SimulationResults_n8$NR_NotPhyloDec),
+                         PP = sum(SimulationResults_n8$NR_FAlg_pos))
+stats = rbind(stats_n6,stats_n7,stats_n8)
+stats
+
+```
+
+# ToDo
+
+* repeat stuff for n=9 and n=10?
+* discuss with Mareike
