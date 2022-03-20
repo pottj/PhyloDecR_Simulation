@@ -37,9 +37,10 @@
 rm(list = ls())
 time0<-Sys.time()
 
-source("myStirlingFunction.R")
-source("myPartitioningFunction.R")
-.libPaths()
+source("../helperFunctions/myStirlingFunction.R")
+source("../helperFunctions/myPartitioningFunction.R")
+.libPaths("C:/userprograms/R_4.1.1/")
+
 library(PhyloDecR)
 library(data.table)
 library(foreach)

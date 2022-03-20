@@ -34,8 +34,8 @@
 rm(list = ls())
 time0<-Sys.time()
 
-source("myStirlingFunction.R")
-.libPaths()
+source("../helperFunctions/myStirlingFunction.R")
+.libPaths("C:/userprograms/R_4.1.1/")
 library(PhyloDecR)
 library(data.table)
 library(foreach)
