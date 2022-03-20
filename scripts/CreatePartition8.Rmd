@@ -1,0 +1,383 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+I want to create a data table containing all possible four-way partitions with n=8 taxa. The data table should contain the following columns:
+
+-   set_i: taxa included in partition i of 4, separated by "\|"
+-   allQuads: all quadruples possible with the given partition, separated by "\|"
+
+According to Stirling numbers of the second kind, there are 1,701 different partitions for 8 taxa.
+
+There are five types of partitions:
+
+1)  a \| b \| c \| defgh
+2)  a \| b \| cd \| efgh
+3)  a \| b \| cde \| fgh
+4)  a \| bc \| de \| fgh
+5)  ab \| cd \| ef \| gh
+
+I create them separately and combine them at the end.
+
+In addition, I test the table with the example data set from my master thesis.
+
+# Initialize
+
+```{r}
+rm(list = ls())
+time0<-Sys.time()
+
+source("../helperFunctions/myStirlingFunction.R")
+source("../helperFunctions/myPartitioningFunction.R")
+
+library(PhyloDecR)
+library(data.table)
+library(foreach)
+```
+
+# Check & general parameters
+
+```{r}
+myStirlingFunction(n=8,k=4)
+
+n=8
+x = c(1:n)
+
+```
+
+# Set 1
+
+a \| b \| c \| defghi
+
+```{r}
+allTriples = t(combn(n,3))
+allTriples<-data.table::as.data.table(allTriples)
+names(allTriples) = c("set1","set2","set3")
+
+dumTab = foreach(i = 1:dim(allTriples)[1])%do%{
+  #i=1
+  myRow = allTriples[i,]
+  myX = c(myRow$set1,myRow$set2,myRow$set3)
+  notmyX = x[!is.element(x,myX)]
+  
+  myQuads = myPartitioningFunction(y1 = myRow$set1,
+                                   y2 = myRow$set2,
+                                   y3 = myRow$set3,
+                                   y4 = notmyX)
+  myRow[,set4 := paste(notmyX, collapse = "|")]
+  myRow[,allQuads := myQuads]
+  myRow
+  
+}
+
+tab1 = rbindlist(dumTab)
+head(tab1)
+table(duplicated(tab1$allQuads))
+
+```
+
+# Set 2
+
+a \| b \| cd \| efghi
+
+```{r}
+allTuples = t(combn(n,2))
+allTuples<-data.table::as.data.table(allTuples)
+names(allTuples) = c("set1","set2")
+
+dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
+  #i=1
+  myRow = allTuples[i,]
+  myX = c(myRow$set1,myRow$set2)
+  notmyX = x[!is.element(x,myX)]
+  
+  a = t(combn(length(notmyX),2))
+  a1 = dim(a)[1]
+
+  dumTab2 = foreach(j = 1:a1)%do%{
+    #j=1
+    a2 = a[j,]
+    myRow2 = copy(myRow)
+    
+    x2 = notmyX[a2]
+    x3 = notmyX[!is.element(notmyX,x2)]
+    myRow2[,set3:=paste(x2, collapse = "|")]
+    myRow2[,set4:=paste(x3,collapse = "|")]
+    
+    myQuads = myPartitioningFunction(y1 = myRow2$set1,
+                                     y2 = myRow2$set2,
+                                     y3 = x2,
+                                     y4 = x3)
+    
+    myRow2[,allQuads := myQuads]
+    myRow2
+  }
+  
+  myRow2 = rbindlist(dumTab2)
+  myRow2
+}
+
+tab2 = rbindlist(dumTab)
+head(tab2)
+table(duplicated(tab2$allQuads))
+
+```
+
+# Set 3
+
+a \| b \| cde \| fghi
+
+```{r}
+allTuples = t(combn(n,2))
+allTuples<-data.table::as.data.table(allTuples)
+names(allTuples) = c("set1","set2")
+
+dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
+  #i=1
+  myRow = allTuples[i,]
+  myX = c(myRow$set1,myRow$set2)
+  notmyX = x[!is.element(x,myX)]
+  
+  a = t(combn(length(notmyX),3))
+  a1 = dim(a)[1]
+  
+  dumTab2 = foreach(j = 1:a1)%do%{
+    #j=1
+    a2 = a[j,]
+    myRow2 = copy(myRow)
+    
+    x2 = notmyX[a2]
+    x3 = notmyX[!is.element(notmyX,x2)]
+    myRow2[,set3:=paste(x2, collapse = "|")]
+    myRow2[,set4:=paste(x3,collapse = "|")]
+    
+    myQuads = myPartitioningFunction(y1 = myRow2$set1,
+                                     y2 = myRow2$set2,
+                                     y3 = x2,
+                                     y4 = x3)
+    
+    myRow2[,allQuads := myQuads]
+    myRow2
+  }
+  
+  myRow2 = rbindlist(dumTab2)
+  myRow2
+}
+
+tab3 = rbindlist(dumTab)
+head(tab3)
+table(duplicated(tab3$allQuads))
+tab3 = tab3[!duplicated(allQuads)]
+
+```
+
+# Set 4
+
+a \| bc \| de \| fghi
+
+```{r}
+allSingles = data.table(set1 = x)
+
+dumTab = foreach(i = 1:dim(allSingles)[1])%do%{
+  #i=8
+  myRow = allSingles[i,]
+  myX = c(myRow$set1)
+  notmyX = x[!is.element(x,myX)]
+  
+  a = t(combn(length(notmyX),2))
+  a1 = dim(a)[1]
+  
+  dumTab2 = foreach(j = 1:a1)%do%{
+    #j=14
+    a2 = a[j,]
+    myRow2 = copy(myRow)
+    
+    x2 = notmyX[a2]
+    x3 = notmyX[!is.element(notmyX,x2)]
+    myRow2[,set2:=paste(x2, collapse = "|")]
+    
+    b = t(combn(length(x3),2))
+    b1 = dim(b)[1]
+    
+    dumTab3 = foreach(k = 1:b1)%do%{
+      #k=7
+      b2 = b[k,]
+      myRow3 = copy(myRow2)
+      
+      x4 = x3[b2]
+      x6 = x3[!is.element(x3,x4)]
+      myRow3[,set3:=paste(x4, collapse = "|")]
+      myRow3[,set4:=paste(x6, collapse = "|")]
+      
+      myQuads = myPartitioningFunction(y1 = myRow3$set1,
+                                       y2 = x2,
+                                       y3 = x4,
+                                       y4 = x6)
+      
+      myRow3[,allQuads := myQuads]
+      myRow3
+    }
+    dumTab3 = rbindlist(dumTab3)
+    dumTab3
+  }
+  dumTab2 = rbindlist(dumTab2)
+  dumTab2 = dumTab2[!duplicated(allQuads),]
+  dumTab2
+}
+
+tab4 = rbindlist(dumTab)
+head(tab4)
+table(duplicated(tab4$allQuads))
+
+```
+
+
+# Set 5
+
+ab \| cd \| ef \| gh
+
+```{r}
+allTuples = t(combn(n,2))
+allTuples<-data.table::as.data.table(allTuples)
+names(allTuples) = c("set1","set2")
+allTuples[,tuple := paste(set1,set2,sep = "_")]
+allTuples[,set2 := NULL]
+allTuples[,set1 := NULL]
+
+dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
+  #i=1
+  myRow = allTuples[i,]
+  myX = as.numeric(unlist(strsplit(myRow$tuple,"_")))
+  notmyX = x[!is.element(x,myX)]
+  myRow[,set1:=paste(myX, collapse = "|")]
+  
+  a = t(combn(length(notmyX),2))
+  a1 = dim(a)[1]
+  
+  dumTab2 = foreach(j = 1:a1)%do%{
+    #j=1
+    a2 = a[j,]
+    myRow2 = copy(myRow)
+    
+    x2 = notmyX[a2]
+    x3 = notmyX[!is.element(notmyX,x2)]
+    myRow2[,set2:=paste(x2, collapse = "|")]
+    
+    b = t(combn(length(x3),2))
+    b1 = dim(b)[1]
+    
+    dumTab3 = foreach(k = 1:b1)%do%{
+      #k=1
+      b2 = b[k,]
+      myRow3 = copy(myRow2)
+      
+      x4 = x3[b2]
+      x6 = x3[!is.element(x3,x4)]
+      myRow3[,set3:=paste(x4, collapse = "|")]
+      myRow3[,set4:=paste(x6, collapse = "|")]
+      
+      myQuads = myPartitioningFunction(y1 = myX,
+                                       y2 = x2,
+                                       y3 = x4,
+                                       y4 = x6)
+      
+      myRow3[,allQuads := myQuads]
+      myRow3[,tuple:=NULL]
+      myRow3
+    }
+    dumTab3 = rbindlist(dumTab3)
+    dumTab3
+  }
+  dumTab2 = rbindlist(dumTab2)
+  dumTab2 = dumTab2[!duplicated(allQuads),]
+  dumTab2
+}
+tab5 = rbindlist(dumTab)
+head(tab5)
+table(duplicated(tab5$allQuads))
+tab5 = tab5[!duplicated(allQuads),]
+
+```
+
+# Save
+
+```{r}
+myTab_n8 = rbind(tab1,tab2,tab3,tab4,tab5)
+dim(myTab_n8)
+myStirlingFunction(n=8,k=4)
+
+stopifnot(dim(myTab_n8)[1]==myStirlingFunction(n=8,k=4))
+
+myTab_n8[,status := "uncovered"]
+myTab_n8[,count := 0]
+
+save(myTab_n8,file = "../partitions/partitions_n8.RData")
+
+```
+
+# Test
+
+```{r}
+test1 = createInput(fn="../testData/S8_notDecisive.txt",sepSym = "_")
+test1_checks = initialCheck(test1$data)
+test1_alg<-runAlgorithm(data = test1$data,verbose = T)
+test2 = createInput(fn="../testData/S8_Decisive.txt",sepSym = "_")
+test2_checks = initialCheck(test2$data)
+test2_alg<-runAlgorithm(data = test2$data,verbose = T)
+
+dummy1 = test1$data
+dummy2 = test2$data
+
+dummy1 = dummy1[status=="input",]
+dummy2 = dummy2[status=="input",]
+
+myTab1 = copy(myTab_n8)
+myTab2 = copy(myTab_n8)
+
+for(i in 1:dim(dummy1)[1]){
+  #i=1
+  myInput = dummy1[i,quadruple]
+  filt = grepl(myInput,myTab1$allQuads)
+  myTab1[filt==T,status := "covered"]
+  myTab1[filt==T,count := count + 1]
+  myTab1
+}
+for(i in 1:dim(dummy2)[1]){
+  #i=1
+  myInput = dummy2[i,quadruple]
+  filt = grepl(myInput,myTab2$allQuads)
+  myTab2[filt==T,status := "covered"]
+  myTab2[filt==T,count := count + 1]
+  myTab2
+}
+
+table(myTab1$count)
+table(myTab2$count)
+
+if(min(myTab1$count>0)) message("phylogenetically decisive according to 4WPP") else message("not phylogenetically decisive")
+if(min(myTab2$count>0)) message("phylogenetically decisive according to 4WPP") else message("not phylogenetically decisive")
+
+```
+
+# Session Info
+
+```{r}
+sessionInfo()
+message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
+
+```
