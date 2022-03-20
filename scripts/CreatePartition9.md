@@ -17,7 +17,7 @@ columns:
 According to Stirling numbers of the second kind, there are 7,770
 different partitions for 9 taxa.
 
-There are nine types of partitions:
+There are six types of partitions:
 
 1.  a \| b \| c \| defghi
 2.  a \| b \| cd \| efghi
@@ -567,5 +567,5 @@ sessionInfo()
 #> [13] fastmap_1.1.0    compiler_4.1.1   htmltools_0.5.2  knitr_1.36
 message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
 #> 
-#> TOTAL TIME : 0.89 minutes
+#> TOTAL TIME : 0.893 minutes
 ```

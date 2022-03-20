@@ -24,14 +24,14 @@ I want to create a data table containing all possible four-way partitions with n
 
 According to Stirling numbers of the second kind, there are 7,770 different partitions for 9 taxa.
 
-There are nine types of partitions:
+There are six types of partitions:
 
 1)  a \| b \| c \| defghi
 2)  a \| b \| cd \| efghi
 3)  a \| b \| cde \| fghi
 4)  a \| bc \| de \| fghi
 5)  a \| bc \| def \| ghi
-9)  ab \| cd \| ef \| ghi
+6)  ab \| cd \| ef \| ghi
 
 I create them separately and combine them at the end.
 
