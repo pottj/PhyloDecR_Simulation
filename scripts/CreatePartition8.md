@@ -38,6 +38,7 @@ time0<-Sys.time()
 
 source("../helperFunctions/myStirlingFunction.R")
 source("../helperFunctions/myPartitioningFunction.R")
+source("../helperFunctions/getAllPosQuads.R")
 
 library(PhyloDecR)
 library(data.table)
@@ -50,334 +51,119 @@ library(foreach)
 myStirlingFunction(n=8,k=4)
 #> [1] 1701
 
-n=8
-x = c(1:n)
+myPartitioningFunction
+#> function (z1, z2, z3, z4) 
+#> {
+#>     n = sum(z1, z2, z3, z4)
+#>     x = c(1:n)
+#>     a = t(combn(n, z1))
+#>     a1 = dim(a)[1]
+#>     dumTab1 = foreach(i = 1:a1) %do% {
+#>         a2 = a[i, ]
+#>         x0 = x[a2]
+#>         x1 = x[!is.element(x, x0)]
+#>         myRow1 = data.table::data.table(set1 = paste(x0, collapse = "|"))
+#>         b = t(combn(length(x1), z2))
+#>         b1 = dim(b)[1]
+#>         dumTab2 = foreach(j = 1:b1) %do% {
+#>             b2 = b[j, ]
+#>             myRow2 = copy(myRow1)
+#>             x2 = x1[b2]
+#>             x3 = x1[!is.element(x1, x2)]
+#>             myRow2[, `:=`(set2, paste(x2, collapse = "|"))]
+#>             c = t(combn(length(x3), z3))
+#>             c1 = dim(c)[1]
+#>             dumTab3 = foreach(k = 1:c1) %do% {
+#>                 c2 = c[k, ]
+#>                 myRow3 = copy(myRow2)
+#>                 x4 = x3[c2]
+#>                 x5 = x3[!is.element(x3, x4)]
+#>                 myRow3[, `:=`(set3, paste(x4, collapse = "|"))]
+#>                 myRow3[, `:=`(set4, paste(x5, collapse = "|"))]
+#>                 myQuads = getAllPosQuads(y1 = x0, y2 = x2, y3 = x4, 
+#>                   y4 = x5)
+#>                 myRow3[, `:=`(allQuads, myQuads)]
+#>                 myRow3
+#>             }
+#>             dumTab3 = rbindlist(dumTab3)
+#>             dumTab3
+#>         }
+#>         dumTab2 = rbindlist(dumTab2)
+#>         dumTab2 = dumTab2[!duplicated(allQuads), ]
+#>         dumTab2
+#>     }
+#>     tab = rbindlist(dumTab1)
+#>     head(tab)
+#>     tab = tab[!duplicated(allQuads), ]
+#>     return(tab)
+#> }
+getAllPosQuads
+#> function (y1, y2, y3, y4) 
+#> {
+#>     dum = c(y1, y2, y3, y4)
+#>     stopifnot(sum(duplicated(dum)) == 0)
+#>     quads = c()
+#>     for (t in 1:length(y1)) {
+#>         set1 = y1[t]
+#>         for (u in 1:length(y2)) {
+#>             set2 = y2[u]
+#>             for (v in 1:length(y3)) {
+#>                 set3 = y3[v]
+#>                 for (w in 1:length(y4)) {
+#>                   set4 = y4[w]
+#>                   myY = c(set1, set2, set3, set4)
+#>                   myY = myY[order(myY)]
+#>                   quad = paste(myY[1], myY[2], myY[3], myY[4], 
+#>                     sep = "_")
+#>                   quads = c(quads, quad)
+#>                 }
+#>             }
+#>         }
+#>     }
+#>     quads = quads[order(quads)]
+#>     myQuads <- paste(quads, collapse = "|")
+#>     return(myQuads)
+#> }
 ```
 
 # Set 1
 
-a \| b \| c \| defghi
+a \| b \| c \| defgh == 1 + 1 + 1 + 5
 
 ``` r
-allTriples = t(combn(n,3))
-allTriples<-data.table::as.data.table(allTriples)
-names(allTriples) = c("set1","set2","set3")
-
-dumTab = foreach(i = 1:dim(allTriples)[1])%do%{
-  #i=1
-  myRow = allTriples[i,]
-  myX = c(myRow$set1,myRow$set2,myRow$set3)
-  notmyX = x[!is.element(x,myX)]
-  
-  myQuads = myPartitioningFunction(y1 = myRow$set1,
-                                   y2 = myRow$set2,
-                                   y3 = myRow$set3,
-                                   y4 = notmyX)
-  myRow[,set4 := paste(notmyX, collapse = "|")]
-  myRow[,allQuads := myQuads]
-  myRow
-  
-}
-
-tab1 = rbindlist(dumTab)
-head(tab1)
-#>    set1 set2 set3      set4                                allQuads
-#> 1:    1    2    3 4|5|6|7|8 1_2_3_4|1_2_3_5|1_2_3_6|1_2_3_7|1_2_3_8
-#> 2:    1    2    4 3|5|6|7|8 1_2_3_4|1_2_4_5|1_2_4_6|1_2_4_7|1_2_4_8
-#> 3:    1    2    5 3|4|6|7|8 1_2_3_5|1_2_4_5|1_2_5_6|1_2_5_7|1_2_5_8
-#> 4:    1    2    6 3|4|5|7|8 1_2_3_6|1_2_4_6|1_2_5_6|1_2_6_7|1_2_6_8
-#> 5:    1    2    7 3|4|5|6|8 1_2_3_7|1_2_4_7|1_2_5_7|1_2_6_7|1_2_7_8
-#> 6:    1    2    8 3|4|5|6|7 1_2_3_8|1_2_4_8|1_2_5_8|1_2_6_8|1_2_7_8
-table(duplicated(tab1$allQuads))
-#> 
-#> FALSE 
-#>    56
+tab1 = myPartitioningFunction(1,1,1,5)
 ```
 
 # Set 2
 
-a \| b \| cd \| efghi
+a \| b \| cd \| efgh == 1 + 1 + 2 + 4
 
 ``` r
-allTuples = t(combn(n,2))
-allTuples<-data.table::as.data.table(allTuples)
-names(allTuples) = c("set1","set2")
-
-dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
-  #i=1
-  myRow = allTuples[i,]
-  myX = c(myRow$set1,myRow$set2)
-  notmyX = x[!is.element(x,myX)]
-  
-  a = t(combn(length(notmyX),2))
-  a1 = dim(a)[1]
-
-  dumTab2 = foreach(j = 1:a1)%do%{
-    #j=1
-    a2 = a[j,]
-    myRow2 = copy(myRow)
-    
-    x2 = notmyX[a2]
-    x3 = notmyX[!is.element(notmyX,x2)]
-    myRow2[,set3:=paste(x2, collapse = "|")]
-    myRow2[,set4:=paste(x3,collapse = "|")]
-    
-    myQuads = myPartitioningFunction(y1 = myRow2$set1,
-                                     y2 = myRow2$set2,
-                                     y3 = x2,
-                                     y4 = x3)
-    
-    myRow2[,allQuads := myQuads]
-    myRow2
-  }
-  
-  myRow2 = rbindlist(dumTab2)
-  myRow2
-}
-
-tab2 = rbindlist(dumTab)
-head(tab2)
-#>    set1 set2 set3    set4
-#> 1:    1    2  3|4 5|6|7|8
-#> 2:    1    2  3|5 4|6|7|8
-#> 3:    1    2  3|6 4|5|7|8
-#> 4:    1    2  3|7 4|5|6|8
-#> 5:    1    2  3|8 4|5|6|7
-#> 6:    1    2  4|5 3|6|7|8
-#>                                                           allQuads
-#> 1: 1_2_3_5|1_2_3_6|1_2_3_7|1_2_3_8|1_2_4_5|1_2_4_6|1_2_4_7|1_2_4_8
-#> 2: 1_2_3_4|1_2_3_6|1_2_3_7|1_2_3_8|1_2_4_5|1_2_5_6|1_2_5_7|1_2_5_8
-#> 3: 1_2_3_4|1_2_3_5|1_2_3_7|1_2_3_8|1_2_4_6|1_2_5_6|1_2_6_7|1_2_6_8
-#> 4: 1_2_3_4|1_2_3_5|1_2_3_6|1_2_3_8|1_2_4_7|1_2_5_7|1_2_6_7|1_2_7_8
-#> 5: 1_2_3_4|1_2_3_5|1_2_3_6|1_2_3_7|1_2_4_8|1_2_5_8|1_2_6_8|1_2_7_8
-#> 6: 1_2_3_4|1_2_3_5|1_2_4_6|1_2_4_7|1_2_4_8|1_2_5_6|1_2_5_7|1_2_5_8
-table(duplicated(tab2$allQuads))
-#> 
-#> FALSE 
-#>   420
+tab2 = myPartitioningFunction(1,1,2,4)
 ```
 
 # Set 3
 
-a \| b \| cde \| fghi
+a \| b \| cde \| fgh == 1 + 1 + 3 + 3
 
 ``` r
-allTuples = t(combn(n,2))
-allTuples<-data.table::as.data.table(allTuples)
-names(allTuples) = c("set1","set2")
-
-dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
-  #i=1
-  myRow = allTuples[i,]
-  myX = c(myRow$set1,myRow$set2)
-  notmyX = x[!is.element(x,myX)]
-  
-  a = t(combn(length(notmyX),3))
-  a1 = dim(a)[1]
-  
-  dumTab2 = foreach(j = 1:a1)%do%{
-    #j=1
-    a2 = a[j,]
-    myRow2 = copy(myRow)
-    
-    x2 = notmyX[a2]
-    x3 = notmyX[!is.element(notmyX,x2)]
-    myRow2[,set3:=paste(x2, collapse = "|")]
-    myRow2[,set4:=paste(x3,collapse = "|")]
-    
-    myQuads = myPartitioningFunction(y1 = myRow2$set1,
-                                     y2 = myRow2$set2,
-                                     y3 = x2,
-                                     y4 = x3)
-    
-    myRow2[,allQuads := myQuads]
-    myRow2
-  }
-  
-  myRow2 = rbindlist(dumTab2)
-  myRow2
-}
-
-tab3 = rbindlist(dumTab)
-head(tab3)
-#>    set1 set2  set3  set4
-#> 1:    1    2 3|4|5 6|7|8
-#> 2:    1    2 3|4|6 5|7|8
-#> 3:    1    2 3|4|7 5|6|8
-#> 4:    1    2 3|4|8 5|6|7
-#> 5:    1    2 3|5|6 4|7|8
-#> 6:    1    2 3|5|7 4|6|8
-#>                                                                   allQuads
-#> 1: 1_2_3_6|1_2_3_7|1_2_3_8|1_2_4_6|1_2_4_7|1_2_4_8|1_2_5_6|1_2_5_7|1_2_5_8
-#> 2: 1_2_3_5|1_2_3_7|1_2_3_8|1_2_4_5|1_2_4_7|1_2_4_8|1_2_5_6|1_2_6_7|1_2_6_8
-#> 3: 1_2_3_5|1_2_3_6|1_2_3_8|1_2_4_5|1_2_4_6|1_2_4_8|1_2_5_7|1_2_6_7|1_2_7_8
-#> 4: 1_2_3_5|1_2_3_6|1_2_3_7|1_2_4_5|1_2_4_6|1_2_4_7|1_2_5_8|1_2_6_8|1_2_7_8
-#> 5: 1_2_3_4|1_2_3_7|1_2_3_8|1_2_4_5|1_2_4_6|1_2_5_7|1_2_5_8|1_2_6_7|1_2_6_8
-#> 6: 1_2_3_4|1_2_3_6|1_2_3_8|1_2_4_5|1_2_4_7|1_2_5_6|1_2_5_8|1_2_6_7|1_2_7_8
-table(duplicated(tab3$allQuads))
-#> 
-#> FALSE  TRUE 
-#>   280   280
-tab3 = tab3[!duplicated(allQuads)]
+tab3 = myPartitioningFunction(1,1,3,3)
 ```
 
 # Set 4
 
-a \| bc \| de \| fghi
+a \| bc \| de \| fgh == 1 + 2 + 2 + 3
 
 ``` r
-allSingles = data.table(set1 = x)
-
-dumTab = foreach(i = 1:dim(allSingles)[1])%do%{
-  #i=8
-  myRow = allSingles[i,]
-  myX = c(myRow$set1)
-  notmyX = x[!is.element(x,myX)]
-  
-  a = t(combn(length(notmyX),2))
-  a1 = dim(a)[1]
-  
-  dumTab2 = foreach(j = 1:a1)%do%{
-    #j=14
-    a2 = a[j,]
-    myRow2 = copy(myRow)
-    
-    x2 = notmyX[a2]
-    x3 = notmyX[!is.element(notmyX,x2)]
-    myRow2[,set2:=paste(x2, collapse = "|")]
-    
-    b = t(combn(length(x3),2))
-    b1 = dim(b)[1]
-    
-    dumTab3 = foreach(k = 1:b1)%do%{
-      #k=7
-      b2 = b[k,]
-      myRow3 = copy(myRow2)
-      
-      x4 = x3[b2]
-      x6 = x3[!is.element(x3,x4)]
-      myRow3[,set3:=paste(x4, collapse = "|")]
-      myRow3[,set4:=paste(x6, collapse = "|")]
-      
-      myQuads = myPartitioningFunction(y1 = myRow3$set1,
-                                       y2 = x2,
-                                       y3 = x4,
-                                       y4 = x6)
-      
-      myRow3[,allQuads := myQuads]
-      myRow3
-    }
-    dumTab3 = rbindlist(dumTab3)
-    dumTab3
-  }
-  dumTab2 = rbindlist(dumTab2)
-  dumTab2 = dumTab2[!duplicated(allQuads),]
-  dumTab2
-}
-
-tab4 = rbindlist(dumTab)
-head(tab4)
-#>    set1 set2 set3  set4
-#> 1:    1  2|3  4|5 6|7|8
-#> 2:    1  2|3  4|6 5|7|8
-#> 3:    1  2|3  4|7 5|6|8
-#> 4:    1  2|3  4|8 5|6|7
-#> 5:    1  2|3  5|6 4|7|8
-#> 6:    1  2|3  5|7 4|6|8
-#>                                                                                           allQuads
-#> 1: 1_2_4_6|1_2_4_7|1_2_4_8|1_2_5_6|1_2_5_7|1_2_5_8|1_3_4_6|1_3_4_7|1_3_4_8|1_3_5_6|1_3_5_7|1_3_5_8
-#> 2: 1_2_4_5|1_2_4_7|1_2_4_8|1_2_5_6|1_2_6_7|1_2_6_8|1_3_4_5|1_3_4_7|1_3_4_8|1_3_5_6|1_3_6_7|1_3_6_8
-#> 3: 1_2_4_5|1_2_4_6|1_2_4_8|1_2_5_7|1_2_6_7|1_2_7_8|1_3_4_5|1_3_4_6|1_3_4_8|1_3_5_7|1_3_6_7|1_3_7_8
-#> 4: 1_2_4_5|1_2_4_6|1_2_4_7|1_2_5_8|1_2_6_8|1_2_7_8|1_3_4_5|1_3_4_6|1_3_4_7|1_3_5_8|1_3_6_8|1_3_7_8
-#> 5: 1_2_4_5|1_2_4_6|1_2_5_7|1_2_5_8|1_2_6_7|1_2_6_8|1_3_4_5|1_3_4_6|1_3_5_7|1_3_5_8|1_3_6_7|1_3_6_8
-#> 6: 1_2_4_5|1_2_4_7|1_2_5_6|1_2_5_8|1_2_6_7|1_2_7_8|1_3_4_5|1_3_4_7|1_3_5_6|1_3_5_8|1_3_6_7|1_3_7_8
-table(duplicated(tab4$allQuads))
-#> 
-#> FALSE 
-#>   840
+tab4 = myPartitioningFunction(1,2,2,3)
 ```
 
 # Set 5
 
-ab \| cd \| ef \| gh
+ab \| cd \| ef \| gh == 2 + 2 + 2 + 2
 
 ``` r
-allTuples = t(combn(n,2))
-allTuples<-data.table::as.data.table(allTuples)
-names(allTuples) = c("set1","set2")
-allTuples[,tuple := paste(set1,set2,sep = "_")]
-allTuples[,set2 := NULL]
-allTuples[,set1 := NULL]
-
-dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
-  #i=1
-  myRow = allTuples[i,]
-  myX = as.numeric(unlist(strsplit(myRow$tuple,"_")))
-  notmyX = x[!is.element(x,myX)]
-  myRow[,set1:=paste(myX, collapse = "|")]
-  
-  a = t(combn(length(notmyX),2))
-  a1 = dim(a)[1]
-  
-  dumTab2 = foreach(j = 1:a1)%do%{
-    #j=1
-    a2 = a[j,]
-    myRow2 = copy(myRow)
-    
-    x2 = notmyX[a2]
-    x3 = notmyX[!is.element(notmyX,x2)]
-    myRow2[,set2:=paste(x2, collapse = "|")]
-    
-    b = t(combn(length(x3),2))
-    b1 = dim(b)[1]
-    
-    dumTab3 = foreach(k = 1:b1)%do%{
-      #k=1
-      b2 = b[k,]
-      myRow3 = copy(myRow2)
-      
-      x4 = x3[b2]
-      x6 = x3[!is.element(x3,x4)]
-      myRow3[,set3:=paste(x4, collapse = "|")]
-      myRow3[,set4:=paste(x6, collapse = "|")]
-      
-      myQuads = myPartitioningFunction(y1 = myX,
-                                       y2 = x2,
-                                       y3 = x4,
-                                       y4 = x6)
-      
-      myRow3[,allQuads := myQuads]
-      myRow3[,tuple:=NULL]
-      myRow3
-    }
-    dumTab3 = rbindlist(dumTab3)
-    dumTab3
-  }
-  dumTab2 = rbindlist(dumTab2)
-  dumTab2 = dumTab2[!duplicated(allQuads),]
-  dumTab2
-}
-tab5 = rbindlist(dumTab)
-head(tab5)
-#>    set1 set2 set3 set4
-#> 1:  1|2  3|4  5|6  7|8
-#> 2:  1|2  3|4  5|7  6|8
-#> 3:  1|2  3|4  5|8  6|7
-#> 4:  1|2  3|5  4|6  7|8
-#> 5:  1|2  3|5  4|7  6|8
-#> 6:  1|2  3|5  4|8  6|7
-#>                                                                                                                           allQuads
-#> 1: 1_3_5_7|1_3_5_8|1_3_6_7|1_3_6_8|1_4_5_7|1_4_5_8|1_4_6_7|1_4_6_8|2_3_5_7|2_3_5_8|2_3_6_7|2_3_6_8|2_4_5_7|2_4_5_8|2_4_6_7|2_4_6_8
-#> 2: 1_3_5_6|1_3_5_8|1_3_6_7|1_3_7_8|1_4_5_6|1_4_5_8|1_4_6_7|1_4_7_8|2_3_5_6|2_3_5_8|2_3_6_7|2_3_7_8|2_4_5_6|2_4_5_8|2_4_6_7|2_4_7_8
-#> 3: 1_3_5_6|1_3_5_7|1_3_6_8|1_3_7_8|1_4_5_6|1_4_5_7|1_4_6_8|1_4_7_8|2_3_5_6|2_3_5_7|2_3_6_8|2_3_7_8|2_4_5_6|2_4_5_7|2_4_6_8|2_4_7_8
-#> 4: 1_3_4_7|1_3_4_8|1_3_6_7|1_3_6_8|1_4_5_7|1_4_5_8|1_5_6_7|1_5_6_8|2_3_4_7|2_3_4_8|2_3_6_7|2_3_6_8|2_4_5_7|2_4_5_8|2_5_6_7|2_5_6_8
-#> 5: 1_3_4_6|1_3_4_8|1_3_6_7|1_3_7_8|1_4_5_6|1_4_5_8|1_5_6_7|1_5_7_8|2_3_4_6|2_3_4_8|2_3_6_7|2_3_7_8|2_4_5_6|2_4_5_8|2_5_6_7|2_5_7_8
-#> 6: 1_3_4_6|1_3_4_7|1_3_6_8|1_3_7_8|1_4_5_6|1_4_5_7|1_5_6_8|1_5_7_8|2_3_4_6|2_3_4_7|2_3_6_8|2_3_7_8|2_4_5_6|2_4_5_7|2_5_6_8|2_5_7_8
-table(duplicated(tab5$allQuads))
-#> 
-#> FALSE  TRUE 
-#>   105   315
-tab5 = tab5[!duplicated(allQuads),]
+tab5 = myPartitioningFunction(2,2,2,2)
 ```
 
 # Save
@@ -491,5 +277,5 @@ sessionInfo()
 #> [13] fastmap_1.1.0    compiler_4.1.1   htmltools_0.5.2  knitr_1.36
 message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
 #> 
-#> TOTAL TIME : 0.31 minutes
+#> TOTAL TIME : 0.405 minutes
 ```

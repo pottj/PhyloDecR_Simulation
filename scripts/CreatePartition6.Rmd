@@ -41,6 +41,7 @@ time0<-Sys.time()
 
 source("../helperFunctions/myStirlingFunction.R")
 source("../helperFunctions/myPartitioningFunction.R")
+source("../helperFunctions/getAllPosQuads.R")
 
 library(PhyloDecR)
 library(data.table)
@@ -52,87 +53,25 @@ library(foreach)
 ```{r}
 myStirlingFunction(n=6,k=4)
 
-n=6
-x = c(1:n)
+myPartitioningFunction
+getAllPosQuads
 
 ```
 
 # Set 1
 
-a \| b \| c \| def
+a \| b \| c \| def == 1 + 1 + 1 + 3
 
 ```{r}
-allTriples = t(combn(n,3))
-allTriples<-data.table::as.data.table(allTriples)
-names(allTriples) = c("set1","set2","set3")
-
-dumTab = foreach(i = 1:dim(allTriples)[1])%do%{
-  #i=1
-  myRow = allTriples[i,]
-  myX = c(myRow$set1,myRow$set2,myRow$set3)
-  notmyX = x[!is.element(x,myX)]
-  
-  myQuads = myPartitioningFunction(y1 = myRow$set1,
-                                   y2 = myRow$set2,
-                                   y3 = myRow$set3,
-                                   y4 = notmyX)
-  myRow[,set4 := paste(notmyX, collapse = "|")]
-  myRow[,allQuads := myQuads]
-  myRow
-  
-}
-
-tab1 = rbindlist(dumTab)
-head(tab1)
-table(duplicated(tab1$allQuads))
-
+tab1 = myPartitioningFunction(1,1,1,3)
 ```
 
 # Set 2
 
-a \| b \| cd \| ef
+a \| b \| cd \| ef == 1 + 1 + 2 + 2
 
 ```{r}
-allTuples = t(combn(n,2))
-allTuples<-data.table::as.data.table(allTuples)
-names(allTuples) = c("set1","set2")
-
-dumTab = foreach(i = 1:dim(allTuples)[1])%do%{
-  #i=1
-  myRow = allTuples[i,]
-  myX = c(myRow$set1,myRow$set2)
-  notmyX = x[!is.element(x,myX)]
-  
-  a = t(combn(length(notmyX),2))
-  a1 = dim(a)[1]
-
-  dumTab2 = foreach(j = 1:a1)%do%{
-    #j=1
-    a2 = a[j,]
-    myRow2 = copy(myRow)
-    
-    x2 = notmyX[a2]
-    x3 = notmyX[!is.element(notmyX,x2)]
-    myRow2[,set3:=paste(x2, collapse = "|")]
-    myRow2[,set4:=paste(x3,collapse = "|")]
-    
-    myQuads = myPartitioningFunction(y1 = myRow2$set1,
-                                     y2 = myRow2$set2,
-                                     y3 = x2,
-                                     y4 = x3)
-    
-    myRow2[,allQuads := myQuads]
-    myRow2
-  }
-  
-  myRow2 = rbindlist(dumTab2)
-  myRow2
-}
-
-tab2 = rbindlist(dumTab)
-head(tab2)
-table(duplicated(tab2$allQuads))
-tab2 = tab2[!duplicated(allQuads)]
+tab2 = myPartitioningFunction(1,1,2,2)
 
 ```
 
