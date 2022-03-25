@@ -103,8 +103,11 @@ dumTab2[NR_PhyloDec>0,]
 
 I use for n=6 still the exact test, as the maximal combination number is 6435 < 10000. 
 
-```{r simulation, eval=F}
-dumTab3 = foreach(j=1:max_quad)%do%{
+```{r simulation}
+
+registerDoMC(cores=5)
+
+dumTab3 = foreach(j=1:max_quad)%dopar%{
   # j=10
   message("\nWorking on n=6, k=",j," & rep = max 10,000 ... ")
   time1 = Sys.time()
