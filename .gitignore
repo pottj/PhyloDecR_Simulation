@@ -43,4 +43,3 @@ helperfunctions/*.html
 results/*_rep10000.RData
 results/*_k*.RData
 mySourceFile.R
-scripts/*.html
