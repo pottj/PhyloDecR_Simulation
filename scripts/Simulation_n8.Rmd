@@ -1,0 +1,167 @@
+---
+output: github_document
+---
+
+<!-- Simulation_n8.md is generated from Simulation_n8.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+I want to run a simulation for n=8 taxa. There are 70 possible quadruples with n=8 taxa, and I want to test all possible combinations for k out of 70 quadruples for phylogenetic decisiveness.
+
+For each random set of quadruples, I test both the 4-way-partition-property (**4WPP**, truth) and Fischers algorithm (**FAlg**, test). 
+
+# Initialize
+
+I use a file names *mySourceFile.R* that contains all relevant R packages and user-/server-specific path to the R library. If using this code, you must make all the necessary changes within the template source file. 
+
+```{r init}
+rm(list = ls())
+time0<-Sys.time()
+
+source("../mySourceFile.R")
+source("../helperFunctions/mySimulationFunction.R")
+
+```
+
+# Get input data
+
+In *myTab_n8*, there are all possible Four-way-partitions (4WP) given n=8 taxa. 
+
+In *quadruple_data*, there are all possible quadruples given n=8 taxa. 
+
+```{r input}
+test1 = createInput(fn="../testData/S8_Decisive.txt",sepSym = "_")
+quadruple_data = test1$data
+quadruple_data[,status:=NA]
+max_quad = dim(quadruple_data)[1]-1
+
+load("../partitions/partitions_n8.RData")
+```
+
+# Test loop with 100 repeats
+
+To test my simulation loop, I run it with only 100 repeats (should be rather fast).
+
+```{r test}
+dumTab2 = foreach(j=1:max_quad)%do%{
+  # j=10
+  message("\nWorking on n=8, k=",j," & rep = 100 ... ")
+  time1 = Sys.time()
+  myTest = mySimulationFunction(number_taxa = 8, 
+                                number_quads = j,
+                                repeats = 100,
+                                data1 = quadruple_data,
+                                data2 = myTab_n8,
+                                verbose = F)
+  time2 = Sys.time()
+  x0 = as.numeric(round(difftime(time2,time1,units = "mins"),3))
+  message("       Total time for n=8, k=",j," & rep = 100: " ,round(difftime(time2,time1,units = "mins"),3)," minutes")
+  
+  x1 = myTest$check3 == "CHECK 3 NOT OK - NOT PHYLOGENETICALLY DECISIVE" & 
+    myTest$FWPP == "NOT PHYLOGENETICALLY DECISIVE"
+  x1 = sum(x1)
+  x2 = myTest$FischersAlg == "PHYLOGENETICALLY DECISIVE" & 
+    myTest$FWPP == "PHYLOGENETICALLY DECISIVE"
+  x2 = sum(x2)
+  x3 = myTest$FWPP == "NOT PHYLOGENETICALLY DECISIVE"
+  x3 = sum(x3)
+  x4 = myTest$FWPP == "PHYLOGENETICALLY DECISIVE"
+  x4 = sum(x4)
+  
+  message("       There were ",x1," of ",x3," sets identified by my initial check as not decisive (",round(x1/x3,4)*100,"%)")
+  message("       There were ",x2," of ",x4," sets identified by Fischers algorith as decisive (",round(x2/x4,4)*100,"%)")
+  
+  res = data.table(k = j,
+                   time = x0,
+                   NR_check3_neg = x1,
+                   NR_FAlg_pos = x2,
+                   NR_NotPhyloDec = x3,
+                   NR_PhyloDec = x4)
+  res
+}
+dumTab2 = rbindlist(dumTab2)
+dumTab2[,negRate := NR_check3_neg/NR_NotPhyloDec]
+dumTab2[,posRate := NR_FAlg_pos/NR_PhyloDec]
+dumTab2[NR_PhyloDec==0,posRate := NA]
+dumTab2[NR_NotPhyloDec==0,negRate := NA]
+dumTab2[NR_PhyloDec>0,]
+
+```
+
+# Loop with 10,000 repeats 
+
+
+```{r simulation, eval=TRUE}
+
+registerDoMC(cores=10)
+
+dumTab3 = foreach(j=1:max_quad)%dopar%{
+  # j=10
+  message("\nWorking on n=8, k=",j," & rep = max 10,000 ... ")
+  time1 = Sys.time()
+  myTest = mySimulationFunction(number_taxa = 8, 
+                                number_quads = j,
+                                repeats = 10000,
+                                data1 = quadruple_data,
+                                data2 = myTab_n8,
+                                verbose = F)
+  
+  time2 = Sys.time()
+  x0 = as.numeric(round(difftime(time2,time1,units = "mins"),3))
+  message("       Total time for n=8, k=",j," & rep = 100: " ,round(difftime(time2,time1,units = "mins"),3)," minutes")
+  
+  outfn = paste0("../results/SimulationResults_n8_k",j,"_rep10000.RData")
+  save(myTest,file = outfn)
+  
+  x1 = myTest$check3 == "CHECK 3 NOT OK - NOT PHYLOGENETICALLY DECISIVE" & 
+    myTest$FWPP == "NOT PHYLOGENETICALLY DECISIVE"
+  x1 = sum(x1)
+  x2 = myTest$FischersAlg == "PHYLOGENETICALLY DECISIVE" & 
+    myTest$FWPP == "PHYLOGENETICALLY DECISIVE"
+  x2 = sum(x2)
+  x3 = myTest$FWPP == "NOT PHYLOGENETICALLY DECISIVE"
+  x3 = sum(x3)
+  x4 = myTest$FWPP == "PHYLOGENETICALLY DECISIVE"
+  x4 = sum(x4)
+  
+  message("       There were ",x1," of ",x3," sets identified by my initial check as not decisive (",round(x1/x3,4)*100,"%)")
+  message("       There were ",x2," of ",x4," sets identified by Fischers algorith as decisive (",round(x2/x4,4)*100,"%)")
+  
+  res = data.table(k = j,
+                   time = x0,
+                   NR_check3_neg = x1,
+                   NR_FAlg_pos = x2,
+                   NR_NotPhyloDec = x3,
+                   NR_PhyloDec = x4)
+  res
+}
+SimulationResults_n8 = rbindlist(dumTab3)
+
+SimulationResults_n8[,negRate := NR_check3_neg/NR_NotPhyloDec]
+SimulationResults_n8[,posRate := NR_FAlg_pos/NR_PhyloDec]
+SimulationResults_n8[NR_PhyloDec==0,posRate := NA]
+SimulationResults_n8[NR_NotPhyloDec==0,negRate := NA]
+save(SimulationResults_n8, file = "../results/SimulationResults_n8.RData")
+
+SimulationResults_n8[NR_PhyloDec>0,]
+
+```
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
+
+```
