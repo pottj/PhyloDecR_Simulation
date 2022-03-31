@@ -1,0 +1,220 @@
+---
+output: github_document
+---
+
+<!-- Simulation_n9.md is generated from Simulation_n9.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Summary of Simulations
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+What did I simulate?
+
+**Preparation**: create all possible quadruples and all possible 4-way partitions (4WP) for $n=6, ..., 10$ taxa
+
+**Simulation**: for $n$ taxa, there are $K_n=\binom{n}{4}$ possible quadruples. For each $k \in \{1, ..., K_n\}$, there are $M_k=\binom{K_n}{k}$ combinations of quadruples as input and 10,000 of these $M_k$ combinations are used in the simulation. Each combination is tested for phylogenetic decisiveness according to 4WP (truth) and Fischers algorithm (test). 
+
+All simulation results are saved locally, the summary per $n$ is also stored on github.  
+
+**Here**: Summary of the simulation results (barplots, negative predictive value, power). 
+ 
+Upper border: it was already shown that given an input of $\binom{n}{4} - (n-4)$ quadruples, all sets are phylogenetic decisive: 
+ 
+* $n=6$: $15-2 = 13$
+* $n=7$: $35-3 = 32$
+* $n=8$: $70-4 = 66$
+* $n=9$: $126-5 = 121$
+* $n=10$: $X-6 = Y$
+
+Lower border: there is no simple formular, but I use here my lower bound from my master thesis (set size that covers all triples at least once):
+ 
+* $n=6$: 6
+* $n=7$: 11
+* $n=8$: 14
+* $n=9$: U
+* $n=10$: V
+ 
+# Initialize
+
+I use a file names *mySourceFile.R* that contains all relevant R packages and user-/server-specific path to the R library. If using this code, you must make all the necessary changes within the template source file. 
+
+```{r init}
+rm(list = ls())
+time0<-Sys.time()
+
+source("../mySourceFile.R")
+source("../helperFunctions/my4FTFunction.R")
+
+x06_lb = 6
+x06_ub = 13
+x07_lb = 11
+x07_ub = 32
+x08_lb = 14
+x08_ub = 66
+x09_lb = 24
+x09_ub = 121
+#x10_lb = 14
+#x10_ub = 66
+
+```
+
+# Get data
+
+```{r input}
+load("../results/SimulationResults_n6.RData")
+load("../results/SimulationResults_n7.RData")
+load("../results/SimulationResults_n8.RData")
+load("../results/SimulationResults_n9.RData")
+
+SimulationResults_n6[,n := 6]
+SimulationResults_n7[,n := 7]
+SimulationResults_n8[,n := 8]
+SimulationResults_n9[,n := 9]
+
+sim_n6 = SimulationResults_n6[k>=x06_lb & k<=x06_ub]
+sim_n7 = SimulationResults_n7[k>=x07_lb & k<=x07_ub]
+sim_n8 = SimulationResults_n8[k>=x08_lb & k<=x08_ub]
+sim_n9 = SimulationResults_n9[k>=x09_lb & k<=x09_ub]
+
+sim = rbind(sim_n6,sim_n7,sim_n8,sim_n9)
+sim2 = rbind(SimulationResults_n6,SimulationResults_n7,
+             SimulationResults_n8,SimulationResults_n9)
+```
+
+# Bar plots
+
+```{r barplots}
+dumTab1 = foreach(i = 6:9)%do%{
+  # i=6
+  mySim = copy(sim)
+  mySim = mySim[n == i,]
+  x1 = dim(mySim)[1]
+  
+  PlotData = data.table(n = i, 
+                        k = rep(mySim$k,2),
+                        phyloDec = c(mySim$NR_FAlg_pos,mySim$NR_PhyloDec),
+                        category = c(rep("Algorithm",x1),rep("4WPP",x1)))
+  ggplot(data=PlotData,aes(fill=category, y=phyloDec, x=k)) + 
+    geom_bar(position="dodge", stat="identity")
+  
+  PlotData
+}
+BarPlotData = rbindlist(dumTab1)
+
+ggplot(data=BarPlotData,aes(fill=category, y=phyloDec, x=k)) + 
+  facet_wrap(vars(n), nrow = 2, scales = "free") +
+  geom_bar(position="dodge", stat="identity")
+
+```
+
+#  Contingency tables (overall)
+
+* Prevalence = actual positive (P) / all (N+P)
+* PPV = Positive Predictive Value = true positives (TP) / predicted positives (PP) = conditional probability P(true state positive | prediction positive)
+* NPV = Negative Predictive Value = true negatives (TN) / predicted negatives = conditional probability P(true state negative | prediction negative)
+* TPR = True Positive Rate = sensitivity = power = TP / P
+* TNR = True Negative Rate = specificity = TN / N
+* see also [Wikipedia](https://en.wikipedia.org/wiki/Positive_and_negative_predictive_values)
+
+
+```{r  contingencyTables1, eval=TRUE}
+dumTab2 = foreach(i = 6:9)%do%{
+  # i=6
+  mySim = copy(sim)
+  mySim = mySim[n == i,]
+  stats_1 = my4FTFunction(P = sum(mySim$NR_PhyloDec),
+                          N = sum(mySim$NR_NotPhyloDec),
+                          PP = sum(mySim$NR_FAlg_pos))
+  mySim2 = copy(sim2)
+  mySim2 = mySim2[n == i,]
+  stats_2 = my4FTFunction(P = sum(mySim2$NR_PhyloDec),
+                          N = sum(mySim2$NR_NotPhyloDec),
+                          PP = sum(mySim2$NR_FAlg_pos))
+  
+  stats = rbind(stats_1,stats_2)
+  stats[,n:=i]
+  stats[,setting := c("filtered","all")]
+  stats
+}
+myStats = rbindlist(dumTab2)
+myStats[setting == "filtered"]
+myStats[setting == "all"]
+
+```
+
+**Fazit 1**: NPV is about 98%, i.e. there is a 98% probability that a negative set is really not phylogenically decisive 
+ 
+**Fazit 2**: The power of the algorithm (TPR) is also about 98%. 
+
+#  Contingency tables (per k)
+
+```{r contingencyTables2}
+dumTab3 = foreach(i = 6:9)%do%{
+  # i=6
+  mySim = copy(sim)
+  mySim = mySim[n == i,]
+  
+  dumTab4 = foreach(k = 1:dim(mySim)[1])%do%{
+    # k=1
+    myRow = copy(mySim)
+    myRow = myRow[k,]
+    
+    stats_k = my4FTFunction(P = myRow$NR_PhyloDec,
+                            N = myRow$NR_NotPhyloDec,
+                            PP = myRow$NR_FAlg_pos)
+    stats_k[,n :=i]
+    stats_k[,k := k]
+    stats_k[,status := "filtered"]
+    stats_k
+  }
+  myStats_k = rbindlist(dumTab4)
+  myStats_k
+}
+myStats_k = rbindlist(dumTab3)
+
+filt_TPR = !is.na(myStats_k$TPR)
+filt_NPV = !is.na(myStats_k$NPV)
+
+boxplot(myStats_k$TPR[filt_TPR] ~ myStats_k$n[filt_TPR],
+        xlab = "number of taxa",
+        ylab = "power")
+boxplot(myStats_k$NPV[filt_NPV] ~ myStats_k$n[filt_NPV],
+        xlab = "number of taxa",
+        ylab = "NPV")
+
+tab6 = myStats_k[n==6,summary(TPR)]
+tab7 = myStats_k[n==7,summary(TPR)]
+tab8 = myStats_k[n==8,summary(TPR)]
+tab9 = myStats_k[n==9,summary(TPR)]
+tab_TPR = rbind(tab6,tab7,tab8,tab9)
+
+tab6 = myStats_k[n==6,summary(NPV)]
+tab7 = myStats_k[n==7,summary(NPV)]
+tab8 = myStats_k[n==8,summary(NPV)]
+tab9 = myStats_k[n==9,summary(NPV)]
+tab_NPV = rbind(tab6,tab7,tab8,tab9)
+
+tabs = as.data.table(rbind(tab_NPV,tab_TPR))
+tabs[,n:=rep(c(6:9),2)]
+tabs[,Parameter:=c(rep("NPV",4),rep("TPR",4))]
+tabs = tabs[,c(9,8,1:7)]
+tabs
+
+```
+
+# Session Info
+
+```{r sessionInfo}
+sessionInfo()
+message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "hours"),3)," hours")
+
+```
