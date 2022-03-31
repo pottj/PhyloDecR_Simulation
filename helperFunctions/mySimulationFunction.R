@@ -17,16 +17,16 @@ mySimulationFunction = function(number_taxa, number_quads, repeats, data1, data2
   m = dim(data1)[1]
   
   nr_allCombis = choose(m,k)
-  if(nr_allCombis<repeats) message("Testing all combination only once ...")
-  if(nr_allCombis<repeats) repeats = nr_allCombis 
-  message("Working on ",repeats," repeats of ", nr_allCombis," combinations")
+  if(nr_allCombis<repeats & verbose == T) message("       Testing all combination only once ...")
+  if(nr_allCombis<repeats & verbose == T) repeats = nr_allCombis 
+  message("       Working on ",repeats," repeats of ", nr_allCombis," combinations")
   
   # choosing randomly 10 quadruples of 35
   y = seq(1,repeats,by=ceiling(repeats/100))
   
   dumTab = foreach(i = 1:repeats)%do%{
     #i=10
-    if(is.element(i,y) & verbose==T) message("Working on combination ",i)
+    #if(is.element(i,y) & verbose==T) message("       Working on combination ",i)
     x = sample(x = 1:m,size = k,replace = F)
     data3 = copy(data1)
     data3[x,status := "input"]
