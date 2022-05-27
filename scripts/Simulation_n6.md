@@ -4,7 +4,6 @@
 # Introduction
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 I want to run a simulation for n=6 taxa. There are 15 possible
@@ -94,91 +93,91 @@ dumTab2 = foreach(j=1:max_quad)%do%{
 #>        Input data matches to given taxa size
 #>        Testing all combination only once ...
 #>        Working on 15 repeats of 15 combinations
-#>        Total time for n=6, k=1 & rep = 100: 0.048 minutes
+#>        Total time for n=6, k=1 & rep = 100: 0.054 minutes
 #>        There were 15 of 15 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=2 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 105 combinations
-#>        Total time for n=6, k=2 & rep = 100: 0.31 minutes
+#>        Total time for n=6, k=2 & rep = 100: 0.321 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=3 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 455 combinations
-#>        Total time for n=6, k=3 & rep = 100: 0.296 minutes
+#>        Total time for n=6, k=3 & rep = 100: 0.301 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=4 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 1365 combinations
-#>        Total time for n=6, k=4 & rep = 100: 0.3 minutes
+#>        Total time for n=6, k=4 & rep = 100: 0.302 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=5 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 3003 combinations
-#>        Total time for n=6, k=5 & rep = 100: 0.31 minutes
+#>        Total time for n=6, k=5 & rep = 100: 0.307 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=6 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 5005 combinations
-#>        Total time for n=6, k=6 & rep = 100: 0.327 minutes
+#>        Total time for n=6, k=6 & rep = 100: 0.339 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=7 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 6435 combinations
-#>        Total time for n=6, k=7 & rep = 100: 0.364 minutes
+#>        Total time for n=6, k=7 & rep = 100: 0.366 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=8 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 6435 combinations
-#>        Total time for n=6, k=8 & rep = 100: 0.387 minutes
+#>        Total time for n=6, k=8 & rep = 100: 0.403 minutes
 #>        There were 100 of 100 sets identified by my initial check as not decisive (100%)
 #>        There were 0 of 0 sets identified by Fischers algorith as decisive (NaN%)
 #> 
 #> Working on n=6, k=9 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 5005 combinations
-#>        Total time for n=6, k=9 & rep = 100: 0.439 minutes
-#>        There were 87 of 87 sets identified by my initial check as not decisive (100%)
-#>        There were 0 of 13 sets identified by Fischers algorith as decisive (0%)
+#>        Total time for n=6, k=9 & rep = 100: 0.44 minutes
+#>        There were 96 of 96 sets identified by my initial check as not decisive (100%)
+#>        There were 0 of 4 sets identified by Fischers algorith as decisive (0%)
 #> 
 #> Working on n=6, k=10 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 3003 combinations
-#>        Total time for n=6, k=10 & rep = 100: 0.387 minutes
-#>        There were 50 of 50 sets identified by my initial check as not decisive (100%)
-#>        There were 47 of 50 sets identified by Fischers algorith as decisive (94%)
+#>        Total time for n=6, k=10 & rep = 100: 0.393 minutes
+#>        There were 55 of 58 sets identified by my initial check as not decisive (94.83%)
+#>        There were 40 of 42 sets identified by Fischers algorith as decisive (95.24%)
 #> 
 #> Working on n=6, k=11 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 1365 combinations
-#>        Total time for n=6, k=11 & rep = 100: 0.34 minutes
-#>        There were 18 of 23 sets identified by my initial check as not decisive (78.26%)
-#>        There were 77 of 77 sets identified by Fischers algorith as decisive (100%)
+#>        Total time for n=6, k=11 & rep = 100: 0.343 minutes
+#>        There were 19 of 24 sets identified by my initial check as not decisive (79.17%)
+#>        There were 76 of 76 sets identified by Fischers algorith as decisive (100%)
 #> 
 #> Working on n=6, k=12 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 455 combinations
-#>        Total time for n=6, k=12 & rep = 100: 0.275 minutes
-#>        There were 0 of 3 sets identified by my initial check as not decisive (0%)
-#>        There were 97 of 97 sets identified by Fischers algorith as decisive (100%)
+#>        Total time for n=6, k=12 & rep = 100: 0.273 minutes
+#>        There were 0 of 7 sets identified by my initial check as not decisive (0%)
+#>        There were 93 of 93 sets identified by Fischers algorith as decisive (100%)
 #> 
 #> Working on n=6, k=13 & rep = 100 ...
 #>        Input data matches to given taxa size
 #>        Working on 100 repeats of 105 combinations
-#>        Total time for n=6, k=13 & rep = 100: 0.233 minutes
+#>        Total time for n=6, k=13 & rep = 100: 0.244 minutes
 #>        There were 0 of 0 sets identified by my initial check as not decisive (NaN%)
 #>        There were 100 of 100 sets identified by Fischers algorith as decisive (100%)
 #> 
@@ -186,7 +185,7 @@ dumTab2 = foreach(j=1:max_quad)%do%{
 #>        Input data matches to given taxa size
 #>        Testing all combination only once ...
 #>        Working on 15 repeats of 15 combinations
-#>        Total time for n=6, k=14 & rep = 100: 0.035 minutes
+#>        Total time for n=6, k=14 & rep = 100: 0.039 minutes
 #>        There were 0 of 0 sets identified by my initial check as not decisive (NaN%)
 #>        There were 15 of 15 sets identified by Fischers algorith as decisive (100%)
 dumTab2 = rbindlist(dumTab2)
@@ -196,28 +195,27 @@ dumTab2[NR_PhyloDec==0,posRate := NA]
 dumTab2[NR_NotPhyloDec==0,negRate := NA]
 dumTab2[NR_PhyloDec>0,]
 #>     k  time NR_check3_neg NR_FAlg_pos NR_NotPhyloDec NR_PhyloDec   negRate
-#> 1:  9 0.439            87           0             87          13 1.0000000
-#> 2: 10 0.387            50          47             50          50 1.0000000
-#> 3: 11 0.340            18          77             23          77 0.7826087
-#> 4: 12 0.275             0          97              3          97 0.0000000
-#> 5: 13 0.233             0         100              0         100        NA
-#> 6: 14 0.035             0          15              0          15        NA
-#>    posRate
-#> 1:    0.00
-#> 2:    0.94
-#> 3:    1.00
-#> 4:    1.00
-#> 5:    1.00
-#> 6:    1.00
+#> 1:  9 0.440            96           0             96           4 1.0000000
+#> 2: 10 0.393            55          40             58          42 0.9482759
+#> 3: 11 0.343            19          76             24          76 0.7916667
+#> 4: 12 0.273             0          93              7          93 0.0000000
+#> 5: 13 0.244             0         100              0         100        NA
+#> 6: 14 0.039             0          15              0          15        NA
+#>     posRate
+#> 1: 0.000000
+#> 2: 0.952381
+#> 3: 1.000000
+#> 4: 1.000000
+#> 5: 1.000000
+#> 6: 1.000000
 ```
 
 # Loop with 10,000 repeats
 
 I use for n=6 still the exact test, as the maximal combination number is
-6435 \< 10000.
+6435 &lt; 10000.
 
 ``` r
-
 registerDoMC(cores=5)
 
 dumTab3 = foreach(j=1:max_quad)%dopar%{
@@ -270,12 +268,12 @@ save(SimulationResults_n6, file = "../results/SimulationResults_n6.RData")
 
 SimulationResults_n6[NR_PhyloDec>0,]
 #>     k   time NR_check3_neg NR_FAlg_pos NR_NotPhyloDec NR_PhyloDec   negRate
-#> 1:  9 22.087          4575           0           4585         420 0.9978190
-#> 2: 10 11.819          1575        1296           1635        1368 0.9633028
-#> 3: 11  4.662           225        1080            285        1080 0.7894737
-#> 4: 12  1.277             0         435             20         435 0.0000000
-#> 5: 13  0.278             0         105              0         105        NA
-#> 6: 14  0.041             0          15              0          15        NA
+#> 1:  9 22.202          4575           0           4585         420 0.9978190
+#> 2: 10 12.131          1575        1296           1635        1368 0.9633028
+#> 3: 11  4.762           225        1080            285        1080 0.7894737
+#> 4: 12  1.349             0         435             20         435 0.0000000
+#> 5: 13  0.259             0         105              0         105        NA
+#> 6: 14  0.037             0          15              0          15        NA
 #>      posRate
 #> 1: 0.0000000
 #> 2: 0.9473684
@@ -310,16 +308,21 @@ sessionInfo()
 #> [8] base     
 #> 
 #> other attached packages:
-#> [1] PhyloDecR_0.0.0.9007 doMC_1.3.7           iterators_1.0.13    
-#> [4] foreach_1.5.1        data.table_1.14.2    rmarkdown_2.11      
-#> [7] here_1.0.1          
+#> [1] PhyloDecR_0.0.0.9007 ggplot2_3.3.5        doMC_1.3.7          
+#> [4] iterators_1.0.13     foreach_1.5.1        data.table_1.14.2   
 #> 
 #> loaded via a namespace (and not attached):
-#>  [1] codetools_0.2-18 digest_0.6.29    rprojroot_2.0.2  magrittr_2.0.1  
-#>  [5] evaluate_0.14    highr_0.9        rlang_0.4.12     stringi_1.7.6   
-#>  [9] tools_4.1.0      stringr_1.4.0    xfun_0.29        yaml_2.2.1      
-#> [13] fastmap_1.1.0    compiler_4.1.0   htmltools_0.5.2  knitr_1.37
+#>  [1] compiler_4.1.0   pillar_1.6.4     tools_4.1.0      digest_0.6.29   
+#>  [5] evaluate_0.14    lifecycle_1.0.1  tibble_3.1.6     gtable_0.3.0    
+#>  [9] pkgconfig_2.0.3  rlang_0.4.12     DBI_1.1.2        yaml_2.2.1      
+#> [13] xfun_0.29        fastmap_1.1.0    withr_2.4.3      stringr_1.4.0   
+#> [17] dplyr_1.0.7      knitr_1.37       generics_0.1.1   vctrs_0.3.8     
+#> [21] grid_4.1.0       tidyselect_1.1.1 glue_1.6.0       R6_2.5.1        
+#> [25] fansi_1.0.0      rmarkdown_2.11   purrr_0.3.4      magrittr_2.0.1  
+#> [29] scales_1.1.1     codetools_0.2-18 ellipsis_0.3.2   htmltools_0.5.2 
+#> [33] assertthat_0.2.1 colorspace_2.0-2 utf8_1.2.2       stringi_1.7.6   
+#> [37] munsell_0.5.0    crayon_1.4.2
 message("\nTOTAL TIME : " ,round(difftime(Sys.time(),time0,units = "mins"),3)," minutes")
 #> 
-#> TOTAL TIME : 31.619 minutes
+#> TOTAL TIME : 32.581 minutes
 ```
