@@ -66,7 +66,7 @@ mySimulationFunction_exact = function(number_taxa, number_quads, repeats, data1,
     }  
     
     # Step 4: summary
-    quads = paste(data3$quadruple, collapse ="|")
+    quads = data3[status == "input", paste(quadruple, collapse ="|")]
     res = data.table(check1 = test_1[1],
                      check2 = test_1[2],
                      check3 = test_1[3],
